@@ -46,3 +46,5 @@ def forest_lifecycle():
 # Main loop to run the animation
 while True:
     forest_lifecycle()
+
+
