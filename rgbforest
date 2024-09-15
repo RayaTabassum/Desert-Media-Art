@@ -1,0 +1,48 @@
+import time
+import board
+import neopixel
+
+# Initialize the onboard RGB LED
+led = neopixel.NeoPixel(board.NEOPIXEL, 1)
+
+def forest_lifecycle():
+    # Spring emergence: flashes of light green
+    for _ in range(5):
+        led[0] = (0, 255, 0)
+        time.sleep(0.2)
+        led[0] = (0, 0, 0)
+        time.sleep(0.2)
+
+    # Summer lushness: sustained vibrant green
+    led[0] = (0, 255, 0)
+    time.sleep(5)
+
+    # Autumn transition: green to yellow to red
+    for g in range(255, 0, -5):  # Green to yellow
+        led[0] = (255, g, 0)
+        time.sleep(0.5)
+    for r in range(0, 255, 5):  # Yellow to red
+        led[0] = (r, 0, 0)
+        time.sleep(0.5)
+
+    # Winter dormancy: white to dark blue
+    led[0] = (255, 255, 255)
+    time.sleep(5)
+    for b in range(0, 255, 5):  # White to dark blue
+        led[0] = (0, 0, b)
+        time.sleep(0.5)
+
+    # Fire disturbance: flickering red and orange
+    for _ in range(10):
+        led[0] = (255, 69, 0)  # Orange
+        time.sleep(0.1)
+        led[0] = (255, 0, 0)  # Red
+        time.sleep(0.1)
+
+    # Regrowth: return to soft green
+    led[0] = (0, 128, 0)
+    time.sleep(5)
+
+# Main loop to run the animation
+while True:
+    forest_lifecycle()
