@@ -1,0 +1,63 @@
+#include <Adafruit_NeoPixel.h>
+
+#define NEOPIXEL_PIN 6   // NeoPixel data pin
+#define TRIG_PIN 9       // TRIG pin of ultrasonic sensor
+#define ECHO_PIN 10      // ECHO pin of ultrasonic sensor
+
+#define NUMPIXELS 12     // Number of LEDs in the NeoPixel ring
+
+Adafruit_NeoPixel pixels(NUMPIXELS, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
+
+long duration;
+int distance;
+
+void setup() {
+  pinMode(TRIG_PIN, OUTPUT);
+  pinMode(ECHO_PIN, INPUT);
+
+  pixels.begin();
+
+  Serial.begin(9600);  // Start serial communication
+  Serial.println("Ultrasonic Sensor Debugging");
+}
+
+void loop() {
+  // Send a pulse to trigger the ultrasonic sensor
+  digitalWrite(TRIG_PIN, LOW);
+  delayMicroseconds(2);
+  digitalWrite(TRIG_PIN, HIGH);
+  delayMicroseconds(10);  // Keep the trigger pin high for 10 microseconds
+  digitalWrite(TRIG_PIN, LOW);
+
+  // Measure the time it takes for the echo to return
+  duration = pulseIn(ECHO_PIN, HIGH, 30000);  // Set a timeout (30ms) for pulseIn
+  if (duration == 0) {
+    Serial.println("No Echo: Ensure object is in range or check connections.");
+    distance = 0;
+  } else {
+    distance = duration * 0.034 / 2;  // Calculate the distance in cm
+  }
+
+  // Print the distance value to the serial monitor
+  Serial.print("Distance: ");
+  Serial.print(distance);
+  Serial.println(" cm");
+
+  // Change NeoPixel color based on distance
+  if (distance > 0 && distance < 30) {
+    setRingColor(pixels.Color(0, 0, 255));  // Blue for <30 cm
+  } else if (distance >= 30) {
+    setRingColor(pixels.Color(255, 165, 0));  // Orange for >=30 cm
+  } else {
+    setRingColor(pixels.Color(0, 0, 0));  // Turn off if no valid reading
+  }
+
+  delay(200);  // Short delay to stabilize readings
+}
+
+void setRingColor(uint32_t color) {
+  for (int i = 0; i < NUMPIXELS; i++) {
+    pixels.setPixelColor(i, color);
+  }
+  pixels.show();
+}
